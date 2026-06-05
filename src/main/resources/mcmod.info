@@ -1,0 +1,15 @@
+[
+  {
+    "modid": "examplemod",
+    "name": "Example Mod",
+    "description": "An example mod demonstrating Forge mod structure.",
+    "version": "${version}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": ["YourName"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
