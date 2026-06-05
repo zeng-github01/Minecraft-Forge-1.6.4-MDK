@@ -23,8 +23,8 @@ archivesBaseName = "Example"
 
 minecraft {
     version = "1.6.4-9.11.1.964"
-    //Apply AccessTransformer here uncomment below
-//    accessTransformer("")
+    //Apply the AccessTransformer here, uncomment the section below, and run the setupDevWorkspace task.
+//    accessTransformer("src/main/resources/example_at.cfg")
 }
 
 repositories {
