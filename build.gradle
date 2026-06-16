@@ -1,70 +1,62 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        maven { url uri('local-maven') }
-        maven {
-            name = "forge"
-            url = "https://files.minecraftforge.net/maven"
-        }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.0.4'
-    }
+plugins {
+    id 'java'
+    id 'net.minecraftforge.gradle' version "7.0.26"
+    id("net.minecraftforge.renamer") version "1.1.2"
+
 }
 
-apply plugin: 'forge'
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
-sourceCompatibility = '1.6'
-targetCompatibility = '1.6'
-
-version = "1.0"
-group = "org.Example"
-archivesBaseName = "Example"
-
-minecraft {
-    version = "1.6.4-9.11.1.964"
-    //Apply the AccessTransformer here, uncomment the section below, and run the setupDevWorkspace task.
-//    accessTransformer("src/main/resources/example_at.cfg")
+tasks.withType(JavaCompile) {
+    options.fork = true
+    options.compilerArgs += ['-source', '1.6', '-target', '1.6']
 }
+
+
 
 repositories {
-    maven { url "https://cursemaven.com" }
+    mavenCentral()
+    minecraft.mavenizer(it)
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+}
+
+minecraft {
+    mappings channel: 'snapshot', version: '20130918-1.6.3'
+    runs {
+        register('client') {
+            workingDir = file('runs/main/client/')
+            environment.put("tweakClass", "cpw.mods.fml.common.launcher.FMLTweaker")
+            jvmArgs "-Dfml.ignoreInvalidMinecraftCertificates=true"
+        }
+        register('server') {
+            workingDir = file('runs/main/server/')
+            environment.put("tweakClass", "cpw.mods.fml.common.launcher.FMLTweaker")
+            jvmArgs "-Dfml.ignoreInvalidMinecraftCertificates=true"
+        }
+    }
+    useDefaultAccessTransformer()
 }
 
 dependencies {
+    implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
 }
 
-processResources {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-
-    inputs.property "version", project.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        expand 'version': project.version
-    }
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
-}
-
-jar {
-    manifest {
-        attributes(
-                "FMLCorePlugin": "com.example.MinecraftModifier",
-                "FMLCorePluginContainsFMLMod": "true"
-        )
-    }
-}
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-
-    classifier = 'dev'
-}
+// Set the default mappings file to our default minecraft dependency
+// This must be done after `minecraft.dependency('coords')` has been done so that gradle knows what dependency we want
+// This mapping will be used by default for all renamer tasks, including deobfuscating dependencies
+// You can still override each specific task, this is just to save repeating yourself in your buildscript.
+renamer.mappings.from minecraft.dependency.toSrgFile
 
 
+renamer.classes(tasks.named('jar', Jar)) {
+    // Unless set globally like above, You need to point to the mappings you wish to apply, typically this is
+    // the Mapped names to SRG for older versions.
+    // ForgeGradle/Mavenizer generate these files for the dependencies you declare. So you can use the helper.
+    // Or you can specify the file or dependency if you host them yourself.
+    map.from minecraft.dependency.toSrgFile
 
-artifacts {
-    archives deobfJar
+    legacyAccessTransformers = true
+    // This is publishable task so you can specify things such as the classifier
+    archiveClassifier = 'srg'
 }

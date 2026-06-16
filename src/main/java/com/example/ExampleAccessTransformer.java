@@ -6,6 +6,6 @@ import java.io.IOException;
 
 public class ExampleAccessTransformer extends AccessTransformer {
     protected ExampleAccessTransformer() throws IOException {
-        super("example_at.cfg");
+        super("META-INF/accesstransformer.cfg");
     }
 }
