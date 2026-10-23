@@ -26,12 +26,10 @@ minecraft {
     runs {
         register('client') {
             workingDir = file('runs/main/client/')
-            environment.put("tweakClass", "cpw.mods.fml.common.launcher.FMLTweaker")
             jvmArgs "-Dfml.ignoreInvalidMinecraftCertificates=true"
         }
         register('server') {
             workingDir = file('runs/main/server/')
-            environment.put("tweakClass", "cpw.mods.fml.common.launcher.FMLTweaker")
             jvmArgs "-Dfml.ignoreInvalidMinecraftCertificates=true"
         }
     }
