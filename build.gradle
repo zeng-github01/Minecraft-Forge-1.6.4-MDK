@@ -13,7 +13,6 @@ tasks.withType(JavaCompile) {
 }
 
 
-
 repositories {
     mavenCentral()
     minecraft.mavenizer(it)
@@ -21,16 +20,24 @@ repositories {
     maven fg.minecraftLibsMaven
 }
 
+fgtools {
+    configure('slimelauncher') {
+        version = '0.2.4'
+    }
+}
+
 minecraft {
     mappings channel: 'snapshot', version: '20130918-1.6.3'
     runs {
+        configureEach {
+            systemProperty 'fml.coreMods.load', 'net.minecraftforge.legacyjavafixer.LoadingPlugin'
+            jvmArgs "-Dfml.ignoreInvalidMinecraftCertificates=true"
+        }
         register('client') {
             workingDir = file('runs/main/client/')
-            jvmArgs "-Dfml.ignoreInvalidMinecraftCertificates=true"
         }
         register('server') {
             workingDir = file('runs/main/server/')
-            jvmArgs "-Dfml.ignoreInvalidMinecraftCertificates=true"
         }
     }
     useDefaultAccessTransformer()
@@ -38,6 +45,7 @@ minecraft {
 
 dependencies {
     implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
+    implementation 'net.minecraftforge:legacyjavafixer:2.0.1'
 }
 
 // Set the default mappings file to our default minecraft dependency
